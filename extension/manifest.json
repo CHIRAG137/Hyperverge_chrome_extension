@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Digital Notice Board",
+  "version": "3.0",
+  "description": "A digital notice board.",
+  "permissions": ["tabs"],
+  "background": {
+      "service_worker": "background.js"
+  },
+  "chrome_url_overrides": {
+      "newtab": "main.html"
+  },
+  "web_accessible_resources": [
+      {
+          "resources": ["main.js"],
+          "matches": ["http://127.0.0.1:8000/*"]
+      }
+  ]
+}

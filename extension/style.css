@@ -1,0 +1,230 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.left, .right {
+    padding: 20px;
+}
+
+.left {
+    border-right: 1px solid #ccc;
+}
+
+/* Typography */
+h1, h2 {
+    color: #333;
+}
+
+/* Form Styles */
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Timer Styles */
+#timerDisplay {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.timer-options {
+    margin: 20px 0;
+}
+
+.timer-options label {
+    margin-right: 10px;
+}
+
+.timer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 5px solid #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer-options select {
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* Floating Emojis */
+.floating-emoji {
+    position: absolute;
+    font-size: 2rem;
+    color: #ff6347;
+    pointer-events: none;
+}
+
+.emoji1 { top: 10%; left: 10%; }
+.emoji2 { top: 20%; right: 15%; }
+.emoji3 { bottom: 30%; left: 25%; }
+.emoji4 { bottom: 10%; right: 10%; }
+.emoji5 { top: 40%; left: 60%; }
+.emoji6 { top: 70%; right: 40%; }
+.emoji7 { bottom: 50%; left: 70%; }
+.emoji8 { bottom: 20%; right: 30%; }
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #007bff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.fab:hover {
+    background-color: #0056b3;
+}
+
+/* Chat Popup Styles */
+#chatPopup {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#chatPopup #closeChat {
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#chatPopup h2 {
+    margin: 0;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    text-align: center;
+}
+
+#chatHistory {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: 300px;
+    overflow-y: auto;
+    border-bottom: 1px solid #ccc;
+}
+
+#chatInput {
+    width: calc(100% - 80px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0;
+}
+
+#sendMessage {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#sendMessage:hover {
+    background-color: #0056b3;
+}
+
+/* Misc Styles */
+.weather-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+iframe {
+    border: none;
+}
+
+.iframe-container {
+    margin-bottom: 20px;
+}
+
+iframe {
+    margin: 20px 0;
+}
+
+#issueContainer, #pollContainer {
+    margin-bottom: 20px;
+}

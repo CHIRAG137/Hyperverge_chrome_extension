@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Digital Notice Board</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        width: 90%;
+        max-width: 1200px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .left,
+      .right {
+        padding: 20px;
+      }
+      .left {
+        border-right: 1px solid #ccc;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #timerDisplay {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      iframe {
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      #pollList,
+      #issueList,
+      #NoticeList {
+        list-style: none;
+        padding: 0;
+      }
+      #issueList li,
+      .notice-item {
+        background: #f9f9f9;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .issue-item h2,
+      .notice-item h3 {
+        margin: 0;
+      }
+      .meet-link {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .meet-link button {
+        margin-right: 10px;
+      }
+      .meet-link a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .meet-link a:hover {
+        text-decoration: underline;
+      }
+      .iframe-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+      }
+      .iframe-container iframe {
+        margin-right: 10px;
+      }
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        .left {
+          border-right: none;
+          border-bottom: 1px solid #ccc;
+        }
+        .iframe-container {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .iframe-container iframe {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+      }
+      /* Floating Action Button (FAB) styles */
+      .fab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 1000;
+      }
+      .fab:hover {
+        background-color: #0056b3;
+      }
+      /* Chat Popup styles */
+      #chatPopup {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 400px;
+        height: 500px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        flex-direction: column;
+        padding: 10px;
+        z-index: 1000;
+      }
+      #chatPopup h2 {
+        margin-top: 0;
+      }
+      #chatHistory {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #chatHistory .user {
+        align-self: flex-end;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      #chatHistory .bot {
+        align-self: flex-start;
+        background-color: #f1f1f1;
+        color: #333;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      #chatInput {
+        width: calc(100% - 90px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      #sendMessage {
+        width: 80px;
+        margin-left: 10px;
+      }
+
+      #closeChat {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        color: #007bff;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+      #closeChat:hover {
+        color: #0056b3;
+      }
+      .weather-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .weather-card .temperature {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .weather-card .weather-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 100px;
+        height: auto;
+      }
+      .weather-card .weather-description {
+        margin-top: 60px;
+        font-size: 18px;
+        color: #333;
+      }
+      .weather-card .place {
+        font-size: 22px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .timer-options {
+        margin: 20px 0;
+      }
+      .timer-options label {
+        margin-right: 10px;
+      }
+      .timer-options select {
+        padding: 5px;
+        border-radius: 4px;
+      }
+      /* Floating Emojis */
+      .floating-emoji {
+        position: absolute;
+        font-size: 2rem;
+        animation: float 40s infinite linear, blur 5s infinite alternate;
+        will-change: transform;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes blur {
+        0% {
+          filter: blur(0);
+        }
+        100% {
+          filter: blur(2px);
+        }
+      }
+
+      .emoji1 {
+        top: 10%;
+        left: 10%;
+        animation-duration: 10s, 5s;
+      }
+
+      .emoji2 {
+        top: 30%;
+        left: 70%;
+        animation-duration: 12s;
+      }
+
+      .emoji3 {
+        top: 50%;
+        left: 40%;
+        animation-duration: 15s;
+      }
+
+      .emoji4 {
+        top: 70%;
+        left: 80%;
+        animation-duration: 20s;
+      }
+
+      .emoji5 {
+        top: 15%;
+        left: 40%;
+        animation-duration: 80s;
+      }
+
+      .emoji6 {
+        top: 70%;
+        left: 70%;
+        animation-duration: 82s;
+      }
+
+      .emoji7 {
+        top: 30%;
+        left: 20%;
+        animation-duration: 15s;
+      }
+
+      .emoji8 {
+        top: 20%;
+        left: 80%;
+        animation-duration: 20s;
+      }
+
+      #noticeList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0;
+      }
+
+      .notice-card {
+        list-style: none;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: 250px;
+        height: 150px;
+        box-sizing: border-box;
+      }
+
+      #pollList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0;
+      }
+      
+      .poll-item {
+        list-style: none;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: 250px; 
+        height: 150px; 
+        box-sizing: border-box;
+      }
+      
+      .poll-item h3 {
+        margin: 0 0 10px 0; 
+      }
+      
+      .poll-item ul {
+        padding-left: 20px; 
+      }
+      
+      .poll-item li {
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <div class="weather-card">
+          <h2>Weather Information</h2>
+          <div id="weatherContent">
+            <!-- Weather information will be injected here -->
+          </div>
+        </div>
+
+        <h1>Create Notice</h1>
+        <form id="createNoticeForm">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" required></textarea>
+          <button type="submit">Create Notice</button>
+        </form>
+        <div class="weather-card">
+          <div class="timer">
+            <h2>Pomodoro Timer</h2>
+            <div class="timer-options">
+              <label for="timerType">Select Timer Type:</label>
+              <select id="timerType">
+                <option value="work">Work (25 mins)</option>
+                <option value="short">Short Break (5 mins)</option>
+                <option value="long">Long Break (15 mins)</option>
+              </select>
+            </div>
+            <div class="timer-container">
+              <div id="timerCircle" class="circle"></div>
+              <div id="timerDisplay">25:00</div>
+            </div>
+            <button id="startTimer">Start</button>
+            <button id="resetTimer">Reset</button>
+          </div>
+        </div>
+
+        <div class="poll">
+          <h2>Create Poll</h2>
+          <form id="createPollForm">
+            <label for="pollTitle">Poll Title:</label>
+            <input type="text" id="pollTitle" name="title" required />
+            <label for="pollOptions">Options (comma separated):</label>
+            <input type="text" id="pollOptions" name="options" required />
+            <button type="submit">Create Poll</button>
+          </form>
+        </div>
+
+        <div class="issue">
+          <div class="weather-card">
+            <h2>Create Issue</h2>
+            <form id="createIssueForm">
+              <label for="issueTitle">Issue Title:</label>
+              <input type="text" id="issueTitle" name="title" required />
+              <label for="issueDescription">Description:</label>
+              <textarea
+                id="issueDescription"
+                name="description"
+                required
+              ></textarea>
+              <button type="submit">Create Issue</button>
+            </form>
+          </div>
+        </div>
+        <!-- Google Calendar -->
+        <div class="calendar-container">
+            <h2>Google Calendar</h2>
+            <iframe src="https://calendar.google.com/calendar/embed?src=YOUR_CALENDAR_ID&ctz=YOUR_TIME_ZONE" frameborder="0" width="100%" height="700" scrolling="no"></iframe>
+          </div>
+      </div>
+      <div class="right">
+        <h1>Digital Notice Board</h1>
+        <ul id="noticeList"></ul>
+        <div id="pollContainer">
+          <h2>Existing Polls</h2>
+          <div id="pollList"></div>
+        </div>
+        <h2>Google Slide</h2>
+        <iframe
+          src="https://docs.google.com/presentation/d/1gsqJrVGIo_wMxHjKJ_Euh73Bj565U80EULlKkGkhCJg/edit?usp=sharing"
+          frameborder="0"
+          width="100%"
+          height="299"
+          allowfullscreen="true"
+          padding-botton="40px"
+          padding-botton="40px"
+        ></iframe>
+        <hr />
+        <h2>Feedback Form</h2>
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSefRq5DsDzDYDJkixSBxKNDz30LXzlbPOec1wG9g80N1EKz1g/viewform"
+          width="100%"
+          height="600"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          >Loading…</iframe
+        >
+        <hr />
+        <h2>Google Keep Notes</h2>
+        <button onclick="window.open('https://keep.google.com/', '_blank')">
+          Open Google Sheets
+        </button>
+        <hr />
+        <div class="iframe-container">
+          <h2>Google Sheets</h2>
+          <button
+            onclick="window.open('https://docs.google.com/spreadsheets/d/1ahAMkVeCtTcQ164DCryDdSrOGUDxpY8zxYjdYm9rSzs/edit?gid=0#gid=0', '_blank')"
+          >
+            Open Google Sheets
+          </button>
+        </div>
+        <iframe
+          src="https://docs.google.com/spreadsheets/d/1ahAMkVeCtTcQ164DCryDdSrOGUDxpY8zxYjdYm9rSzs/edit?gid=0#gid=0"
+          frameborder="0"
+          width="100%"
+          height="500"
+          allowfullscreen="true"
+        ></iframe>
+        <hr />
+      </div>
+    </div>
+
+    <!-- Floating Emojis -->
+    <div class="floating-emoji emoji1">&#x1F388;</div>
+    <div class="floating-emoji emoji2">&#x1F389;</div>
+    <div class="floating-emoji emoji3">&#x2728;</div>
+    <div class="floating-emoji emoji4">&#x1F31F;</div>
+    <div class="floating-emoji emoji5">&#x1F388;</div>
+    <div class="floating-emoji emoji6">&#x1F389;</div>
+    <div class="floating-emoji emoji7">&#x2728;</div>
+    <div class="floating-emoji emoji8">&#x1F31F;</div>
+
+    <div id="chatPopup">
+      <span id="closeChat">&times;</span>
+      <h2>Chat with Bot</h2>
+      <ul id="chatHistory"></ul>
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Type your message here..."
+      />
+      <button id="sendMessage">Send</button>
+    </div>
+
+    <div class="fab">
+      <span>&#9993;</span>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

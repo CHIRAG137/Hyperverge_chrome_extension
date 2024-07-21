@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Digital Notice Board</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        width: 90%;
+        max-width: 1200px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .left,
+      .right {
+        padding: 20px;
+      }
+      .left {
+        border-right: 1px solid #ccc;
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #timerDisplay {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      iframe {
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      #pollList,
+      #issueList,
+      #NoticeList {
+        list-style: none;
+        padding: 0;
+      }
+      #issueList li,
+      .notice-item {
+        background: #f9f9f9;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .issue-item h2,
+      .notice-item h3 {
+        margin: 0;
+      }
+      .meet-link {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+      }
+      .meet-link button {
+        margin-right: 10px;
+      }
+      .meet-link a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .meet-link a:hover {
+        text-decoration: underline;
+      }
+      .iframe-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+      }
+      .iframe-container iframe {
+        margin-right: 10px;
+      }
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        .left {
+          border-right: none;
+          border-bottom: 1px solid #ccc;
+        }
+        .iframe-container {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .iframe-container iframe {
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+      }
+      /* Floating Action Button (FAB) styles */
+      .fab {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 1000;
+      }
+      .fab:hover {
+        background-color: #0056b3;
+      }
+      /* Chat Popup styles */
+      #chatPopup {
+        position: fixed;
+        bottom: 100px;
+        right: 20px;
+        width: 400px;
+        height: 500px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        flex-direction: column;
+        padding: 10px;
+        z-index: 1000;
+      }
+      #chatPopup h2 {
+        margin-top: 0;
+      }
+      #chatHistory {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #chatHistory .user {
+        align-self: flex-end;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      #chatHistory .bot {
+        align-self: flex-start;
+        background-color: #f1f1f1;
+        color: #333;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+        max-width: 80%;
+        word-wrap: break-word;
+      }
+
+      #chatInput {
+        width: calc(100% - 90px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      #sendMessage {
+        width: 80px;
+        margin-left: 10px;
+      }
+
+      #closeChat {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        color: #007bff;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+      #closeChat:hover {
+        color: #0056b3;
+      }
+      .weather-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .weather-card .temperature {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+      .weather-card .weather-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 100px; /* Adjust size as needed */
+        height: auto;
+      }
+      .weather-card .weather-description {
+        margin-top: 60px; /* Adjust to make space for temperature and icon */
+        font-size: 18px;
+        color: #333;
+      }
+      .weather-card .place {
+        font-size: 22px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .timer-options {
+        margin: 20px 0;
+      }
+      .timer-options label {
+        margin-right: 10px;
+      }
+      .timer-options select {
+        padding: 5px;
+        border-radius: 4px;
+      }
+      /* Floating Emojis */
+      .floating-emoji {
+        position: absolute;
+        font-size: 2rem;
+        animation: float 40s infinite linear, blur 5s infinite alternate;
+        will-change: transform;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh);
+          opacity: 0;
+        }
+      }
+
+      @keyframes blur {
+        0% {
+          filter: blur(0);
+        }
+        100% {
+          filter: blur(2px);
+        }
+      }
+
+      .emoji1 {
+        top: 10%;
+        left: 10%;
+        animation-duration: 10s, 5s;
+      }
+
+      .emoji2 {
+        top: 30%;
+        left: 70%;
+        animation-duration: 12s;
+      }
+
+      .emoji3 {
+        top: 50%;
+        left: 40%;
+        animation-duration: 15s;
+      }
+
+      .emoji4 {
+        top: 70%;
+        left: 80%;
+        animation-duration: 20s;
+      }
+
+      .emoji5 {
+        top: 15%;
+        left: 40%;
+        animation-duration: 80s;
+      }
+
+      .emoji6 {
+        top: 70%;
+        left: 70%;
+        animation-duration: 82s;
+      }
+
+      .emoji7 {
+        top: 30%;
+        left: 20%;
+        animation-duration: 15s;
+      }
+
+      .emoji8 {
+        top: 20%;
+        left: 80%;
+        animation-duration: 20s;
+      }
+
+      #noticeList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0;
+      }
+
+      .notice-card {
+        list-style: none;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: 250px; /* Fixed width */
+        height: 150px; /* Fixed height */
+        box-sizing: border-box;
+      }
+
+      #pollList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0;
+      }
+
+      .poll-item {
+        list-style: none;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        width: 250px; /* Fixed width */
+        height: 150px; /* Fixed height */
+        box-sizing: border-box;
+      }
+
+      .poll-item h3 {
+        margin: 0 0 10px 0; /* Margin for title */
+      }
+
+      .poll-item ul {
+        padding-left: 20px; /* Padding for list items */
+      }
+
+      .poll-item li {
+        margin-bottom: 5px; /* Space between list items */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <div class="weather-card">
+          <h2>Weather Information</h2>
+          <div id="weatherContent">
+            <!-- Weather information will be injected here -->
+          </div>
+        </div>
+
+        <h1>Create Notice</h1>
+        <form id="createNoticeForm">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" required></textarea>
+          <button type="submit">Create Notice</button>
+        </form>
+        <div class="weather-card">
+          <div class="timer">
+            <h2>Pomodoro Timer</h2>
+            <div class="timer-options">
+              <label for="timerType">Select Timer Type:</label>
+              <select id="timerType">
+                <option value="work">Work (25 mins)</option>
+                <option value="short">Short Break (5 mins)</option>
+                <option value="long">Long Break (15 mins)</option>
+              </select>
+            </div>
+            <div class="timer-container">
+              <div id="timerCircle" class="circle"></div>
+              <div id="timerDisplay">25:00</div>
+            </div>
+            <button id="startTimer">Start</button>
+            <button id="resetTimer">Reset</button>
+          </div>
+        </div>
+
+        <div class="poll">
+          <h2>Create Poll</h2>
+          <form id="createPollForm">
+            <label for="pollTitle">Poll Title:</label>
+            <input type="text" id="pollTitle" name="title" required />
+            <label for="pollOptions">Options (comma separated):</label>
+            <input type="text" id="pollOptions" name="options" required />
+            <button type="submit">Create Poll</button>
+          </form>
+        </div>
+
+        <div class="issue">
+          <div class="weather-card">
+            <h2>Create Issue</h2>
+            <form id="createIssueForm">
+              <label for="issueTitle">Issue Title:</label>
+              <input type="text" id="issueTitle" name="title" required />
+              <label for="issueDescription">Description:</label>
+              <textarea
+                id="issueDescription"
+                name="description"
+                required
+              ></textarea>
+              <button type="submit">Create Issue</button>
+            </form>
+          </div>
+        </div>
+        <!-- Google Calendar -->
+        <div class="calendar-container">
+          <h2>Google Calendar</h2>
+          <iframe
+            src="https://calendar.google.com/calendar/embed?src=YOUR_CALENDAR_ID&ctz=YOUR_TIME_ZONE"
+            frameborder="0"
+            width="100%"
+            height="700"
+            scrolling="no"
+          ></iframe>
+        </div>
+      </div>
+      <div class="right">
+        <h1>Digital Notice Board</h1>
+        <ul id="noticeList"></ul>
+        <div id="pollContainer">
+          <h2>Existing Polls</h2>
+          <div id="pollList"></div>
+        </div>
+        <h2>Google Slide</h2>
+        <iframe
+          src="https://docs.google.com/presentation/d/1gsqJrVGIo_wMxHjKJ_Euh73Bj565U80EULlKkGkhCJg/edit?usp=sharing"
+          frameborder="0"
+          width="100%"
+          height="299"
+          allowfullscreen="true"
+          padding-botton="40px"
+          padding-botton="40px"
+        ></iframe>
+        <hr />
+        <h2>Feedback Form</h2>
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSefRq5DsDzDYDJkixSBxKNDz30LXzlbPOec1wG9g80N1EKz1g/viewform"
+          width="100%"
+          height="600"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          >Loading…</iframe
+        >
+        <hr />
+        <h2>Google Keep Notes</h2>
+        <button onclick="window.open('https://keep.google.com/', '_blank')">
+          Open Google Sheets
+        </button>
+        <hr />
+        <div class="iframe-container">
+          <h2>Google Sheets</h2>
+          <button
+            onclick="window.open('https://docs.google.com/spreadsheets/d/1ahAMkVeCtTcQ164DCryDdSrOGUDxpY8zxYjdYm9rSzs/edit?gid=0#gid=0', '_blank')"
+          >
+            Open Google Sheets
+          </button>
+        </div>
+        <iframe
+          src="https://docs.google.com/spreadsheets/d/1ahAMkVeCtTcQ164DCryDdSrOGUDxpY8zxYjdYm9rSzs/edit?gid=0#gid=0"
+          frameborder="0"
+          width="100%"
+          height="500"
+          allowfullscreen="true"
+        ></iframe>
+        <hr />
+      </div>
+    </div>
+
+    <!-- Floating Emojis -->
+    <div class="floating-emoji emoji1">&#x1F388;</div>
+    <div class="floating-emoji emoji2">&#x1F389;</div>
+    <div class="floating-emoji emoji3">&#x2728;</div>
+    <div class="floating-emoji emoji4">&#x1F31F;</div>
+    <div class="floating-emoji emoji5">&#x1F388;</div>
+    <div class="floating-emoji emoji6">&#x1F389;</div>
+    <div class="floating-emoji emoji7">&#x2728;</div>
+    <div class="floating-emoji emoji8">&#x1F31F;</div>
+
+    <div id="chatPopup">
+      <span id="closeChat">&times;</span>
+      <h2>Chat with Bot</h2>
+      <ul id="chatHistory"></ul>
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Type your message here..."
+      />
+      <button id="sendMessage">Send</button>
+    </div>
+
+    <div class="fab">
+      <span>&#9993;</span>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Load existing notices and polls
+        loadNotices();
+        loadPolls();
+
+        // Setup event handlers for forms
+        document
+          .getElementById("createNoticeForm")
+          .addEventListener("submit", handleNoticeSubmit);
+        document
+          .getElementById("createPollForm")
+          .addEventListener("submit", handlePollSubmit);
+        document
+          .getElementById("createIssueForm")
+          .addEventListener("submit", handleIssueSubmit);
+
+        // Initialize Pomodoro Timer and chat functionality
+        initializePomodoroTimer();
+        initializeChat();
+
+        /**
+         * Handles the submission of the notice creation form.
+         * @param {Event} event - The form submit event.
+         */
+        async function handleNoticeSubmit(event) {
+          event.preventDefault();
+          const title = document.getElementById("title").value;
+          const message = document.getElementById("message").value;
+
+          try {
+            const response = await fetch("http://127.0.0.1:8000/api/notice/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, message }),
+            });
+
+            if (response.ok) {
+              const notice = await response.json();
+              addNoticeToList(notice);
+              document.getElementById("createNoticeForm").reset();
+            } else {
+              console.error("Failed to create notice");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        /**
+         * Handles the submission of the poll creation form.
+         * @param {Event} event - The form submit event.
+         */
+        async function handlePollSubmit(event) {
+          event.preventDefault();
+          const title = document.getElementById("pollTitle").value;
+          const optionsText = document
+            .getElementById("pollOptions")
+            .value.split(",")
+            .map((option) => option.trim());
+          const options = optionsText.map((optionText) => ({
+            option_text: optionText,
+          }));
+
+          try {
+            const response = await fetch("http://127.0.0.1:8000/api/poll/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, options }),
+            });
+
+            if (response.ok) {
+              const poll = await response.json();
+              addPollToList(poll);
+              document.getElementById("createPollForm").reset();
+            } else {
+              console.error("Failed to create poll");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        /**
+         * Handles the submission of the issue creation form.
+         * @param {Event} event - The form submit event.
+         */
+        async function handleIssueSubmit(event) {
+          event.preventDefault();
+          const title = document.getElementById("issueTitle").value;
+          const description = document.getElementById("issueDescription").value;
+
+          try {
+            const response = await fetch("http://127.0.0.1:8000/api/issues/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, description }),
+            });
+
+            if (response.ok) {
+              const issue = await response.json();
+              addIssueToList(issue);
+              document.getElementById("createIssueForm").reset();
+            } else {
+              console.error("Failed to create issue");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        /**
+         * Initializes the Pomodoro Timer functionality.
+         */
+        function initializePomodoroTimer() {
+          let timer;
+          let minutes = 25;
+          let seconds = 0;
+
+          /**
+           * Updates the timer display on the page.
+           */
+          function updateTimerDisplay() {
+            document.getElementById("timerDisplay").textContent = `${String(
+              minutes
+            ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+          }
+
+          /**
+           * Starts the Pomodoro timer.
+           */
+          function startTimer() {
+            if (timer) clearInterval(timer);
+            timer = setInterval(() => {
+              if (seconds === 0) {
+                if (minutes === 0) {
+                  clearInterval(timer);
+                  alert("Pomodoro session ended!");
+                  return;
+                }
+                minutes--;
+                seconds = 59;
+              } else {
+                seconds--;
+              }
+              updateTimerDisplay();
+            }, 1000);
+          }
+
+          /**
+           * Resets the Pomodoro timer based on the selected timer type.
+           */
+          function resetTimer() {
+            clearInterval(timer);
+
+            const timerType = document.getElementById("timerType").value;
+            switch (timerType) {
+              case "short":
+                minutes = 5;
+                break;
+              case "long":
+                minutes = 15;
+                break;
+              case "work":
+              default:
+                minutes = 25;
+                break;
+            }
+            seconds = 0;
+            updateTimerDisplay();
+          }
+
+          // Event listeners for timer controls
+          document
+            .getElementById("timerType")
+            .addEventListener("change", resetTimer);
+          document
+            .getElementById("startTimer")
+            .addEventListener("click", startTimer);
+          document
+            .getElementById("resetTimer")
+            .addEventListener("click", resetTimer);
+
+          // Initialize timer display on page load
+          updateTimerDisplay();
+        }
+
+        /**
+         * Initializes the chat functionality.
+         */
+        function initializeChat() {
+          const fab = document.querySelector(".fab");
+          const chatPopup = document.getElementById("chatPopup");
+          const closeChat = document.getElementById("closeChat");
+          const sendMessageButton = document.getElementById("sendMessage");
+          const chatInput = document.getElementById("chatInput");
+          const chatHistory = document.getElementById("chatHistory");
+
+          fab.addEventListener("click", () => {
+            chatPopup.style.display = "flex";
+          });
+
+          closeChat.addEventListener("click", () => {
+            chatPopup.style.display = "none";
+          });
+
+          sendMessageButton.addEventListener("click", sendMessage);
+          chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+          });
+
+          /**
+           * Sends a message to the chat API and displays the response.
+           */
+          async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message === "") return;
+
+            displayMessage("You", message, "user");
+            chatInput.value = "";
+
+            try {
+              const response = await fetch("http://127.0.0.1:8000/api/chat/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: new URLSearchParams({ user_input: message }),
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                displayMessage("Bot", data.response, "bot");
+              } else {
+                displayMessage(
+                  "Bot",
+                  "Sorry, something went wrong. Please try again later.",
+                  "bot"
+                );
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              displayMessage(
+                "Bot",
+                "Sorry, something went wrong. Please try again later.",
+                "bot"
+              );
+            }
+          }
+
+          /**
+           * Displays a chat message in the chat history.
+           * @param {string} sender - The sender of the message (e.g., "You" or "Bot").
+           * @param {string} message - The message content.
+           * @param {string} type - The type of message ("user" or "bot").
+           */
+          function displayMessage(sender, message, type) {
+            const messageElement = document.createElement("li");
+            messageElement.className = type;
+            messageElement.textContent = `${sender}: ${message}`;
+            chatHistory.appendChild(messageElement);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+          }
+        }
+
+        /**
+         * Loads notices from the API and adds them to the notice list.
+         */
+        async function loadNotices() {
+          try {
+            const response = await fetch("http://127.0.0.1:8000/api/notice/");
+            if (response.ok) {
+              const notices = await response.json();
+              notices.forEach(addNoticeToList);
+            } else {
+              console.error("Failed to load notices");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        /**
+         * Loads polls from the API and adds them to the poll list.
+         */
+        async function loadPolls() {
+          try {
+            const response = await fetch("http://127.0.0.1:8000/api/poll/");
+            if (response.ok) {
+              const polls = await response.json();
+              polls.forEach(addPollToList);
+            } else {
+              console.error("Failed to load polls");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        }
+
+        /**
+         * Adds a notice to the list displayed on the page.
+         * @param {Object} notice - The notice object to add.
+         */
+        function addNoticeToList(notice) {
+          const noticeList = document.getElementById("noticeList");
+          const listItem = document.createElement("li");
+          listItem.className = "notice-card";
+          listItem.innerHTML = `<h2>${notice.title}</h2><p>${
+            notice.message
+          }</p><p><small>${new Date(
+            notice.created_at
+          ).toLocaleString()}</small></p>`;
+          noticeList.appendChild(listItem);
+        }
+
+        /**
+         * Adds a poll to the list displayed on the page.
+         * @param {Object} poll - The poll object to add.
+         */
+        function addPollToList(poll) {
+          const pollList = document.getElementById("pollList");
+          const pollDiv = document.createElement("div");
+          pollDiv.className = "poll-item";
+          pollDiv.innerHTML = `<h3>${poll.title}</h3><ul>${poll.options
+            .map(
+              (option) =>
+                `<li>${option.option_text} (${option.votes} votes)</li>`
+            )
+            .join("")}</ul>`;
+          pollList.appendChild(pollDiv);
+        }
+
+        /**
+         * Adds an issue to the list displayed on the page.
+         * @param {Object} issue - The issue object to add.
+         */
+        function addIssueToList(issue) {
+          const issueList = document.getElementById("issueList");
+          const listItem = document.createElement("li");
+          listItem.innerHTML = `<h2>${issue.title}</h2><p>${
+            issue.description
+          }</p><p><small>${new Date(
+            issue.created_at
+          ).toLocaleString()}</small></p>`;
+          issueList.appendChild(listItem);
+        }
+
+        /**
+         * Retrieves the value of a specific cookie by name.
+         * @param {string} name - The name of the cookie.
+         * @returns {string|null} - The cookie value or null if not found.
+         */
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(
+                  cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+
+        // Weather API endpoint and fetch call
+        const apiUrl =
+          "https://api.openweathermap.org/data/2.5/weather?q=Ranchi&appid=771adaa3d4dc34c12b39933918248ec1&units=metric";
+
+        /**
+         * Fetches and displays weather data on the page.
+         */
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            const place = data.name;
+            const temperature = data.main.temp;
+            const weather = data.weather[0].description;
+            const iconCode = data.weather[0].icon;
+
+            const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+            const weatherContent = `
+                <div class="weather-info">
+                    <img src="${iconUrl}" alt="${weather}" class="weather-icon">
+                    <p>${place}</p>
+                    <p>${temperature}°C</p>
+                    <p>${weather}</p>
+                </div>
+              `;
+
+            document.getElementById("weatherContent").innerHTML =
+              weatherContent;
+          })
+          .catch((error) => {
+            console.error("Error fetching weather data:", error);
+            document.getElementById("weatherContent").innerHTML =
+              "<p>Failed to load weather data.</p>";
+          });
+      });
+    </script>
+  </body>
+</html>
