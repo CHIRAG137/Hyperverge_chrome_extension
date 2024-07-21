@@ -20,6 +20,14 @@ Once cloned go to a fresh browser home page and click on right top corner bar an
 ### Step 4:
 Click on load unpacked and then select the extension folder from the cloned repo. Then you are good to go and use the extension.
 
+![Screenshot](screenshots/Screenshot%20(349).png)
 ![Screenshot](screenshots/Screenshot%20(338).png)
+![Screenshot](screenshots/Screenshot%20(339).png)
+![Screenshot](screenshots/Screenshot%20(340).png)
+![Screenshot](screenshots/Screenshot%20(341).png)
+![Screenshot](screenshots/Screenshot%20(343).png)
+![Screenshot](screenshots/Screenshot%20(345).png)
+![Screenshot](screenshots/Screenshot%20(347).png)
+![Screenshot](screenshots/Screenshot%20(348).png)
 
 
