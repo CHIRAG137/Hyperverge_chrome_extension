@@ -6,7 +6,7 @@ Follow these steps to set up and use the extension
 
 ### Step 1: Clone the Repository
 
-First, clone the repository to your local machie
+First, clone the repository to your local machien
 
 ```bash
 git clone https://github.com/CHIRAG137/Hyperverge_chrome_extensionn
