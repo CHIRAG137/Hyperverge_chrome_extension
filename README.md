@@ -12,7 +12,7 @@ First, clone the repository to your local machi
 git clone https://github.com/CHIRAG137/Hyperverge_chrome_extensionn
 ```
 ### Step 2:
-I have added all the environemnt variables in the code only so that you can use them directly and do not have to make on your owns, so there is no env file.
+I have added all the environemnt variables in the code only so that you can use them directly and do not have to make on your owns, so there is o env file.
 
 ### Step 3:
 Once cloned go to a fresh browser home page and click on right top corner bar and select extensions.
