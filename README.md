@@ -4,7 +4,7 @@
 
 Follow these steps to set up and use the extension-
 
-### Step 1: Clone the Repository
+### Step 1: Clone the Repositoruu
 
 First, clone the repository to your local machie
 
