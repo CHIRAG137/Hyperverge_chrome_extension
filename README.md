@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-Follow these steps to set up and use the extension-
+Follow these steps to set up and use the extension
 
 ### Step 1: Clone the Repositoruu
 
