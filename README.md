@@ -15,7 +15,7 @@ git clone https://github.com/CHIRAG137/Hyperverge_chrome_extensionn
 I have added all the environemnt variables in the code only so that you can use them directly and do not have to make on your owns, so there is o env file.
 
 ### Step 3:
-Once cloned go to a fresh browser home page and click on right top corner bar and select extensions.
+Once cloned go to a fresh browser home page and click on right to corner bar and select extensions.
 
 ### Step 4:
 Click on load unpacked and then select the extension folder from the cloned repo. Then you are good to go and use the extension.
